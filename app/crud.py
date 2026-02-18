@@ -36,7 +36,6 @@ def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate):
     """Realiza una actualización parcial de un usuario existente."""
     db_user = get_user(db, user_id)
     if db_user:
-        # Pydantic V2: usa model_dump para actualizaciones parciales
         update_data = user_update.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             setattr(db_user, key, value)
@@ -52,3 +51,5 @@ def delete_user(db: Session, user_id: int) -> bool:
         db.commit()
         return True
     return False
+
+"""Comentario de prueba CI/CD"""
