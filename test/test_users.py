@@ -130,3 +130,25 @@ def test_delete_user():
     # Verificar inexistencia
     verify_response = client.get(f"/users/{user_id}")
     assert verify_response.status_code == 404
+
+def test_create_user_duplicate_username():
+    """
+    Prueba que no se permita crear dos usuarios con el mismo username.
+    Debe retornar un error 400.
+    """
+    payload = {
+        "username": "duplicado",
+        "email": "original@ex.com",
+        "first_name": "Orig",
+        "last_name": "User",
+        "role": "user"
+    }
+    # Primer registro
+    client.post("/users/", json=payload)
+
+    # Segundo registro con el mismo username
+    payload["email"] = "otro@ex.com"  # Cambiamos el email para aislar el error de username
+    response = client.post("/users/", json=payload)
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "El nombre de usuario ya está registrado."
