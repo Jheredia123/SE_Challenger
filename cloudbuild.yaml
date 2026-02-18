@@ -1,5 +1,5 @@
 steps:
-  # 1. Ejecutar Tests: Si fallan, el proceso se detiene aquí.
+  # 1. Ejecutar Tests: El pipeline se detiene si los tests fallan
   - name: 'python:3.12-slim'
     entrypoint: /bin/sh
     args:
@@ -8,13 +8,20 @@ steps:
         pip install -r requirements.txt
         pytest
 
-  # 2. Construir la imagen de Docker usando la ruta de Artifact Registry
+  # 2. Construir la imagen de Docker en Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/user-api', '.']
+    args: [
+      'build',
+      '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/user-api',
+      '.'
+    ]
 
-  # 3. Subir la imagen al repositorio que creaste en GCP
+  # 3. Subir la imagen al repositorio us-central1
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/user-api']
+    args: [
+      'push',
+      'us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/user-api'
+    ]
 
   # 4. Desplegar en Google Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -28,5 +35,10 @@ steps:
       - '--platform=managed'
       - '--allow-unauthenticated'
 
+# Referencia de la imagen para el resumen del build
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/user-api'
+
+# SOLUCIÓN LOGS: Fuerza el uso de Cloud Logging
+options:
+  logging: CLOUD_LOGGING_ONLY
