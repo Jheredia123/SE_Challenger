@@ -1,0 +1,6 @@
+fastapi[all]
+sqlalchemy
+pydantic[email]
+psycopg2-binary
+pytest
+httpx
